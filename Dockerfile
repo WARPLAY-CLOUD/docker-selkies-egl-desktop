@@ -560,11 +560,18 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
         libxext6 && \
     if [ "$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')" \> "20.04" ]; then apt-get install --no-install-recommends -y xcvt libopenh264-dev svt-av1 aom-tools; else apt-get install --no-install-recommends -y mesa-utils-extra; fi && \
     # Automatically fetch the latest Selkies version and install the components
-    SELKIES_VERSION="$(curl -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/latest" | jq -r '.tag_name' | sed 's/[^0-9\.\-]*//g')" && \
-    echo "${SELKIES_VERSION}" && \
+    echo "Fetching Selkies version from CDN..." && \
+    SELKIES_VERSION="1.6.2-default" && \
+    echo "Using fixed Selkies version: ${SELKIES_VERSION}" && \
+    echo "Ubuntu version: $(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')" && \
+    echo "Architecture: $(dpkg --print-architecture)" && \
+    echo "Downloading gstreamer-selkies package..." && \
     cd /opt && curl -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/gstreamer-selkies_gpl_v${SELKIES_VERSION}_ubuntu$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')_$(dpkg --print-architecture).tar.gz" | tar -xzf - && \
+    echo "Downloading selkies_gstreamer Python package..." && \
     cd /tmp && curl -O -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies_gstreamer-${SELKIES_VERSION}-py3-none-any.whl" && pip3 install --no-cache-dir --force-reinstall "selkies_gstreamer-${SELKIES_VERSION}-py3-none-any.whl" "websockets<14.0" && rm -f "selkies_gstreamer-${SELKIES_VERSION}-py3-none-any.whl" && \
+    echo "Downloading selkies-gstreamer-web package..." && \
     cd /opt && curl -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies-gstreamer-web_v${SELKIES_VERSION}.tar.gz" | tar -xzf - && \
+    echo "Downloading selkies-js-interposer package..." && \
     cd /tmp && curl -o selkies-js-interposer.deb -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies-js-interposer_v${SELKIES_VERSION}_ubuntu$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')_$(dpkg --print-architecture).deb" && apt-get update && apt-get install --no-install-recommends -y ./selkies-js-interposer.deb && rm -f selkies-js-interposer.deb && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/debconf/* /var/log/* /tmp/* /var/tmp/*
 

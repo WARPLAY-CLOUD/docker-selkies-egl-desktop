@@ -263,7 +263,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 }" > /usr/share/glvnd/egl_vendor.d/10_nvidia.json
 # Expose NVIDIA libraries and paths
 ENV PATH="/usr/local/nvidia/bin${PATH:+:${PATH}}"
-ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+${LD_LIBRARY_PATH}:}/usr/local/nvidia/lib:/usr/local/nvidia/lib64"
+ENV LD_LIBRARY_PATH="/usr/local/nvidia/lib:/usr/local/nvidia/lib64"
 # Make all NVIDIA GPUs visible by default
 ENV NVIDIA_VISIBLE_DEVICES=all
 # All NVIDIA driver capabilities should preferably be used, check `NVIDIA_DRIVER_CAPABILITIES` inside the container if things do not work
@@ -570,7 +570,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     cd /opt && curl -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/gstreamer-selkies_gpl_v${SELKIES_VERSION}_ubuntu$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')_$(dpkg --print-architecture).tar.gz" | tar -xzf - && \
     echo "Downloading selkies_gstreamer Python package..." && \
     echo "URL: https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies_gstreamer-v${SELKIES_VERSION}-py3-none-any.whl" && \
-    cd /tmp && curl -O -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies_gstreamer-${SELKIES_VERSION}-py3-none-any.whl" && pip3 install --no-cache-dir --force-reinstall "selkies_gstreamer-${SELKIES_VERSION}-py3-none-any.whl" "websockets<14.0" && rm -f "selkies_gstreamer-${SELKIES_VERSION}-py3-none-any.whl" && \
+    cd /tmp && curl -O -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies_gstreamer-v${SELKIES_VERSION}-py3-none-any.whl" && pip3 install --no-cache-dir --force-reinstall "selkies_gstreamer-v${SELKIES_VERSION}-py3-none-any.whl" "websockets<14.0" && rm -f "selkies_gstreamer-v${SELKIES_VERSION}-py3-none-any.whl" && \
     echo "Downloading selkies-gstreamer-web package..." && \
     echo "URL: https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies-gstreamer-web_v${SELKIES_VERSION}.tar.gz" && \
     cd /opt && curl -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies-gstreamer-web_v${SELKIES_VERSION}.tar.gz" | tar -xzf - && \
@@ -613,9 +613,9 @@ USER 1000
 
 ENV PIPEWIRE_LATENCY="128/48000"
 ENV XDG_RUNTIME_DIR=/tmp/runtime-ubuntu
-ENV PIPEWIRE_RUNTIME_DIR="${PIPEWIRE_RUNTIME_DIR:-${XDG_RUNTIME_DIR:-/tmp}}"
-ENV PULSE_RUNTIME_PATH="${PULSE_RUNTIME_PATH:-${XDG_RUNTIME_DIR:-/tmp}/pulse}"
-ENV PULSE_SERVER="${PULSE_SERVER:-unix:${PULSE_RUNTIME_PATH:-${XDG_RUNTIME_DIR:-/tmp}/pulse}/native}"
+ENV PIPEWIRE_RUNTIME_DIR="/tmp/runtime-ubuntu"
+ENV PULSE_RUNTIME_PATH="/tmp/runtime-ubuntu/pulse"
+ENV PULSE_SERVER="unix:/tmp/runtime-ubuntu/pulse/native"
 
 # dbus-daemon to the below address is required during startup
 ENV DBUS_SYSTEM_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR:-/tmp}/dbus-system-bus"

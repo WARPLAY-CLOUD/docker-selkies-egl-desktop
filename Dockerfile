@@ -567,16 +567,16 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     echo "Architecture: $(dpkg --print-architecture)" && \
     echo "Downloading gstreamer-selkies package..." && \
     echo "URL: https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/gstreamer-selkies_gpl_v${SELKIES_VERSION}_ubuntu$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')_$(dpkg --print-architecture).tar.gz" && \
-    cd /opt && curl -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/gstreamer-selkies_gpl_v${SELKIES_VERSION}_ubuntu$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')_$(dpkg --print-architecture).tar.gz" | tar -xzf - && \
+    cd /opt && curl -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/gstreamer-selkies_gpl_v${SELKIES_VERSION}_ubuntu$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')_$(dpkg --print-architecture).tar.gz" | tar -xzf - && echo "GStreamer package downloaded successfully" && \
     echo "Downloading selkies_gstreamer Python package..." && \
     echo "URL: https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies_gstreamer-v${SELKIES_VERSION}-py3-none-any.whl" && \
-    cd /tmp && curl -O -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies_gstreamer-v${SELKIES_VERSION}-py3-none-any.whl" && pip3 install --no-cache-dir --force-reinstall "selkies_gstreamer-v${SELKIES_VERSION}-py3-none-any.whl" "websockets<14.0" && rm -f "selkies_gstreamer-v${SELKIES_VERSION}-py3-none-any.whl" && \
+    cd /tmp && curl -O -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies_gstreamer-v${SELKIES_VERSION}-py3-none-any.whl" && echo "Python wheel downloaded successfully" && pip3 install --no-cache-dir --force-reinstall "selkies_gstreamer-v${SELKIES_VERSION}-py3-none-any.whl" "websockets<14.0" && rm -f "selkies_gstreamer-v${SELKIES_VERSION}-py3-none-any.whl" && \
     echo "Downloading selkies-gstreamer-web package..." && \
     echo "URL: https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies-gstreamer-web_v${SELKIES_VERSION}.tar.gz" && \
-    cd /opt && curl -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies-gstreamer-web_v${SELKIES_VERSION}.tar.gz" | tar -xzf - && \
+    cd /opt && curl -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies-gstreamer-web_v${SELKIES_VERSION}.tar.gz" | tar -xzf - && echo "Web package downloaded successfully" && \
     echo "Downloading selkies-js-interposer package..." && \
     echo "URL: https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies-js-interposer_v${SELKIES_VERSION}_ubuntu$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')_$(dpkg --print-architecture).deb" && \
-    cd /tmp && curl -o selkies-js-interposer.deb -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies-js-interposer_v${SELKIES_VERSION}_ubuntu$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')_$(dpkg --print-architecture).deb" && apt-get update && apt-get install --no-install-recommends -y ./selkies-js-interposer.deb && rm -f selkies-js-interposer.deb && \
+    cd /tmp && curl -o selkies-js-interposer.deb -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies-js-interposer_v${SELKIES_VERSION}_ubuntu$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')_$(dpkg --print-architecture).deb" && echo "JS interposer downloaded successfully" && apt-get update && apt-get install --no-install-recommends -y ./selkies-js-interposer.deb && rm -f selkies-js-interposer.deb && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/debconf/* /var/log/* /tmp/* /var/tmp/*
 
 # Install the KasmVNC web interface and RustDesk for fallback

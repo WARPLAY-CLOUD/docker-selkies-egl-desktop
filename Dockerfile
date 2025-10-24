@@ -567,7 +567,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     # Automatically fetch the latest Selkies version and install the components
     # менять SELKIES_VERSION и UBUNTU_VERSION если будут проблемы.
     echo "Fetching Selkies version from CDN..." && \
-    SELKIES_VERSION="1.6.2-default" && \
+    SELKIES_VERSION="1.6.2def" && \
     UBUNTU_VERSION="24.04" && \
     ARCH="amd64" && \
     echo "Using fixed Selkies version: ${SELKIES_VERSION}" && \

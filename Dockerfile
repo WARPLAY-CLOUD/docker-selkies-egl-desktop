@@ -565,6 +565,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
             apt-get install --no-install-recommends -y mesa-utils-extra; \
         fi && \
     # Automatically fetch the latest Selkies version and install the components
+    # менять SELKIES_VERSION и UBUNTU_VERSION если будут проблемы.
     echo "Fetching Selkies version from CDN..." && \
     SELKIES_VERSION="1.6.2-default" && \
     UBUNTU_VERSION="24.04" && \
@@ -594,6 +595,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     apt-get update && apt-get install --no-install-recommends -y ./selkies-js-interposer.deb && \
     rm -f selkies-js-interposer.deb && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/debconf/* /var/log/* /tmp/* /var/tmp/*
+
 
 # Install the KasmVNC web interface and RustDesk for fallback
 RUN KASMVNC_VERSION="$(curl -fsSL "https://api.github.com/repos/kasmtech/KasmVNC/releases/latest" | jq -r '.tag_name' | sed 's/[^0-9\.\-]*//g')" && \

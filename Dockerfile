@@ -558,7 +558,12 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
         libxv1 \
         libxtst6 \
         libxext6 && \
-    if [ "$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')" \> "20.04" ]; then apt-get install --no-install-recommends -y xcvt libopenh264-dev svt-av1 aom-tools; else apt-get install --no-install-recommends -y mesa-utils-extra; fi && \
+        
+        if [[ "$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')" > "20.04" ]]; then \
+            apt-get install --no-install-recommends -y xcvt libopenh264-dev svt-av1 aom-tools; \
+        else \
+            apt-get install --no-install-recommends -y mesa-utils-extra; \
+        fi && \
     # Automatically fetch the latest Selkies version and install the components
     echo "Fetching Selkies version from CDN..." && \
     SELKIES_VERSION="1.6.2-default" && \

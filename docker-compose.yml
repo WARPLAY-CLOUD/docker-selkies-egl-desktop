@@ -42,7 +42,7 @@ services:
       # Selkies parameters, for additional configurations see `selkies-gstreamer --help`
       ###
       # Change `SELKIES_ENCODER` to `x264enc`, `vp8enc`, or `vp9enc` if using software fallback without allocated GPUs or your GPU does not support `H.264 (AVCHD)` under the `NVENC - Encoding` section in https://developer.nvidia.com/video-encode-and-decode-gpu-support-matrix-new
-      - SELKIES_ENCODER=nvh264enc
+      - SELKIES_ENCODER=x264enc
       - SELKIES_ENABLE_RESIZE=false
       # Initial video bitrate in kilobits per second, may be changed later within web interface
       - SELKIES_VIDEO_BITRATE=8000
@@ -58,21 +58,13 @@ services:
       #    - SELKIES_BASIC_AUTH_PASSWORD=mypasswd
       # Enable HTTPS web interface from inside the container
       - SELKIES_ENABLE_HTTPS=false
+      # TURN server configuration
+      - SELKIES_TURN_HOST=turn.warplay.cloud
+      - SELKIES_TURN_PORT=3478
+      - SELKIES_TURN_PROTOCOL=udp
+      - SELKIES_TURN_TLS=false
+      - SELKIES_TURN_USERNAME=some_user
+      - SELKIES_TURN_PASSWORD=some_password
     # Volume mount trusted HTTPS certificate to new path for no web browser warnings
 #    - SELKIES_HTTPS_CERT=/etc/ssl/certs/ssl-cert-snakeoil.pem
 #    - SELKIES_HTTPS_KEY=/etc/ssl/private/ssl-cert-snakeoil.key
-###
-# Uncomment and configure below to use a TURN server for improved network compatibility
-###
-#    - SELKIES_TURN_HOST=turn.example.com
-#    - SELKIES_TURN_PORT=3478
-# Change to `tcp` if the UDP protocol is throttled or blocked in your client network, or when the TURN server does not support UDP
-#    - SELKIES_TURN_PROTOCOL=udp
-# You need a valid hostname and a certificate from authorities such as ZeroSSL or Let's Encrypt with your TURN server to enable TURN over TLS
-#    - SELKIES_TURN_TLS=false
-# Provide only `SELKIES_TURN_SHARED_SECRET` for time-limited shared secret authentication or both `SELKIES_TURN_USERNAME` and `SELKIES_TURN_PASSWORD` for legacy long-term authentication, but do not provide both authentication methods at the same time
-#    - SELKIES_TURN_SHARED_SECRET=MyTURNServerSharedSecretPlaceholder
-#    - SELKIES_TURN_USERNAME=username
-#    - SELKIES_TURN_PASSWORD=mypasswd
-# TURN REST URI authentication, all TURN server settings above are ignored if enabled
-#    - 'SELKIES_TURN_REST_URI=http://localhost:8008'

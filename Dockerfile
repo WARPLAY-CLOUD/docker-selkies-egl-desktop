@@ -560,7 +560,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
         libxext6 && \
     if [ "$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')" \> "20.04" ]; then apt-get install --no-install-recommends -y xcvt libopenh264-dev svt-av1 aom-tools; else apt-get install --no-install-recommends -y mesa-utils-extra; fi && \
     # Install Selkies components from CDN (cdn.warplay.cloud)
-    echo "========================================" && \
+    echo "======================================== " && \
     echo "Fetching latest Selkies version from CDN..." && \
     SELKIES_VERSION="$(curl -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/latest" | jq -r '.tag_name')" && \
     if [ -z "${SELKIES_VERSION}" ] || [ "${SELKIES_VERSION}" = "null" ]; then \
@@ -685,9 +685,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     apt-get update && apt-get install --no-install-recommends -y ./selkies-js-interposer.deb && \
     rm -f selkies-js-interposer.deb && \
     echo "  ✓ JS Interposer installed" && \
-    echo "========================================" && \
+    echo "======================================== " && \
     echo "✓ Selkies v${SELKIES_VERSION} installation completed successfully!" && \
-    echo "========================================" && \
+    echo "======================================== " && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/debconf/* /var/log/* /tmp/* /var/tmp/*
 
 # Install the KasmVNC web interface and RustDesk for fallback

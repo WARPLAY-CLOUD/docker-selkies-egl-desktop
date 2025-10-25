@@ -560,12 +560,18 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
         libxext6 && \
     if [ "$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')" \> "20.04" ]; then apt-get install --no-install-recommends -y xcvt libopenh264-dev svt-av1 aom-tools; else apt-get install --no-install-recommends -y mesa-utils-extra; fi && \
     # Install Selkies components from CDN (cdn.warplay.cloud)
-    SELKIES_VERSION="1.6.2def" && \
+    echo "========================================" && \
+    echo "Fetching latest Selkies version from CDN..." && \
+    SELKIES_VERSION="$(curl -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/latest" | jq -r '.tag_name')" && \
+    if [ -z "${SELKIES_VERSION}" ] || [ "${SELKIES_VERSION}" = "null" ]; then \
+        echo "✗ ERROR: Failed to fetch Selkies version from CDN" && \
+        echo "  Please check: https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/latest" && \
+        exit 1; \
+    fi && \
+    echo "✓ Latest Selkies version: ${SELKIES_VERSION}" && \
     UBUNTU_VERSION="$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')" && \
     ARCH="$(dpkg --print-architecture)" && \
     CDN_BASE_URL="https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}" && \
-    echo "========================================" && \
-    echo "Installing Selkies v${SELKIES_VERSION}" && \
     echo "Ubuntu Version: ${UBUNTU_VERSION}" && \
     echo "Architecture: ${ARCH}" && \
     echo "CDN Base URL: ${CDN_BASE_URL}" && \

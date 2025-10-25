@@ -59,13 +59,7 @@ services:
       #    - SELKIES_BASIC_AUTH_PASSWORD=mypasswd
       # Enable HTTPS web interface from inside the container
       - SELKIES_ENABLE_HTTPS=false
-      # TURN server configuration
-      - SELKIES_TURN_HOST=turn.warplay.cloud
-      - SELKIES_TURN_PORT=3478
-      - SELKIES_TURN_PROTOCOL=udp
-      - SELKIES_TURN_TLS=false
-      - SELKIES_TURN_USERNAME=some_user
-      - SELKIES_TURN_PASSWORD=some_password
+      # TURN server configuration removed - using internal TURN server
     # Volume mount trusted HTTPS certificate to new path for no web browser warnings
 #    - SELKIES_HTTPS_CERT=/etc/ssl/certs/ssl-cert-snakeoil.pem
 #    - SELKIES_HTTPS_KEY=/etc/ssl/private/ssl-cert-snakeoil.key

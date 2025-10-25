@@ -626,7 +626,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
         exit 1; \
     fi && \
     echo "  - Installing via pip3..." && \
-    pip3 install --no-cache-dir --force-reinstall "${WHL_FILE}" "websockets<14.0" && \
+    pip3 install --no-cache-dir --force-reinstall --ignore-installed idna "${WHL_FILE}" "websockets<14.0" && \
     rm -f "${WHL_FILE}" && \
     echo "  ✓ Python package installed" && \
     # Step 3: Download and extract Selkies GStreamer Web interface to /opt

@@ -576,14 +576,50 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     GSTREAMER_FILE="gstreamer-selkies_gpl_v${SELKIES_VERSION}_ubuntu${UBUNTU_VERSION}_${ARCH}.tar.gz" && \
     echo "  - File: ${GSTREAMER_FILE}" && \
     echo "  - URL: ${CDN_BASE_URL}/${GSTREAMER_FILE}" && \
-    cd /opt && curl -fsSL "${CDN_BASE_URL}/${GSTREAMER_FILE}" | tar -xzf - && \
+    cd /tmp && \
+    echo "  - Downloading file (this may take a while)..." && \
+    curl -fSL --progress-bar -w "HTTP Status: %{http_code}, Size: %{size_download} bytes\n" \
+        -o "${GSTREAMER_FILE}" "${CDN_BASE_URL}/${GSTREAMER_FILE}" && \
+    if [ ! -f "${GSTREAMER_FILE}" ]; then \
+        echo "  ✗ ERROR: File was not downloaded!" && exit 1; \
+    fi && \
+    FILE_SIZE=$(stat -c%s "${GSTREAMER_FILE}" 2>/dev/null || stat -f%z "${GSTREAMER_FILE}" 2>/dev/null) && \
+    FILE_SIZE_MB=$((FILE_SIZE / 1024 / 1024)) && \
+    echo "  - Downloaded file size: ${FILE_SIZE_MB} MB (${FILE_SIZE} bytes)" && \
+    if [ ${FILE_SIZE} -lt 10000000 ]; then \
+        echo "  ✗ ERROR: File is too small (< 10 MB), probably download failed or CDN error" && \
+        echo "  - File contents preview:" && \
+        head -20 "${GSTREAMER_FILE}" && \
+        exit 1; \
+    fi && \
+    echo "  - Verifying archive integrity..." && \
+    if ! gzip -t "${GSTREAMER_FILE}" 2>/dev/null; then \
+        echo "  ✗ ERROR: Archive is corrupted or not a valid gzip file!" && \
+        exit 1; \
+    fi && \
+    echo "  - Extracting to /opt..." && \
+    cd /opt && tar -xzf "/tmp/${GSTREAMER_FILE}" && \
+    rm -f "/tmp/${GSTREAMER_FILE}" && \
     echo "  ✓ GStreamer bundle extracted to /opt" && \
     # Step 2: Download and install Python wheel package
     echo "[2/4] Downloading and installing Selkies GStreamer Python package..." && \
     WHL_FILE="selkies_gstreamer-${SELKIES_VERSION}-py3-none-any.whl" && \
     echo "  - File: ${WHL_FILE}" && \
     echo "  - URL: ${CDN_BASE_URL}/${WHL_FILE}" && \
-    cd /tmp && curl -O -fsSL "${CDN_BASE_URL}/${WHL_FILE}" && \
+    cd /tmp && \
+    echo "  - Downloading file..." && \
+    curl -fSL --progress-bar -w "HTTP Status: %{http_code}, Size: %{size_download} bytes\n" \
+        -o "${WHL_FILE}" "${CDN_BASE_URL}/${WHL_FILE}" && \
+    if [ ! -f "${WHL_FILE}" ]; then \
+        echo "  ✗ ERROR: File was not downloaded!" && exit 1; \
+    fi && \
+    WHL_SIZE=$(stat -c%s "${WHL_FILE}" 2>/dev/null || stat -f%z "${WHL_FILE}" 2>/dev/null) && \
+    echo "  - Downloaded file size: $((WHL_SIZE / 1024)) KB (${WHL_SIZE} bytes)" && \
+    if [ ${WHL_SIZE} -lt 10000 ]; then \
+        echo "  ✗ ERROR: File is too small (< 10 KB), probably download failed" && \
+        cat "${WHL_FILE}" && \
+        exit 1; \
+    fi && \
     echo "  - Installing via pip3..." && \
     pip3 install --no-cache-dir --force-reinstall "${WHL_FILE}" "websockets<14.0" && \
     rm -f "${WHL_FILE}" && \
@@ -593,7 +629,28 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     WEB_FILE="selkies-gstreamer-web_v${SELKIES_VERSION}.tar.gz" && \
     echo "  - File: ${WEB_FILE}" && \
     echo "  - URL: ${CDN_BASE_URL}/${WEB_FILE}" && \
-    cd /opt && curl -fsSL "${CDN_BASE_URL}/${WEB_FILE}" | tar -xzf - && \
+    cd /tmp && \
+    echo "  - Downloading file..." && \
+    curl -fSL --progress-bar -w "HTTP Status: %{http_code}, Size: %{size_download} bytes\n" \
+        -o "${WEB_FILE}" "${CDN_BASE_URL}/${WEB_FILE}" && \
+    if [ ! -f "${WEB_FILE}" ]; then \
+        echo "  ✗ ERROR: File was not downloaded!" && exit 1; \
+    fi && \
+    WEB_SIZE=$(stat -c%s "${WEB_FILE}" 2>/dev/null || stat -f%z "${WEB_FILE}" 2>/dev/null) && \
+    echo "  - Downloaded file size: $((WEB_SIZE / 1024)) KB (${WEB_SIZE} bytes)" && \
+    if [ ${WEB_SIZE} -lt 100000 ]; then \
+        echo "  ✗ ERROR: File is too small (< 100 KB), probably download failed" && \
+        head -20 "${WEB_FILE}" && \
+        exit 1; \
+    fi && \
+    echo "  - Verifying archive integrity..." && \
+    if ! gzip -t "${WEB_FILE}" 2>/dev/null; then \
+        echo "  ✗ ERROR: Archive is corrupted or not a valid gzip file!" && \
+        exit 1; \
+    fi && \
+    echo "  - Extracting to /opt..." && \
+    cd /opt && tar -xzf "/tmp/${WEB_FILE}" && \
+    rm -f "/tmp/${WEB_FILE}" && \
     echo "  ✓ Web interface extracted to /opt" && \
     # Step 4: Download and install Selkies JS Interposer (using Ubuntu 22.04 version for compatibility with 24.04)
     echo "[4/4] Downloading and installing Selkies JS Interposer..." && \
@@ -605,7 +662,21 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     JS_FILE="selkies-js-interposer_v${SELKIES_VERSION}_ubuntu${JS_UBUNTU_VERSION}_${ARCH}.deb" && \
     echo "  - File: ${JS_FILE}" && \
     echo "  - URL: ${CDN_BASE_URL}/${JS_FILE}" && \
-    cd /tmp && curl -o selkies-js-interposer.deb -fsSL "${CDN_BASE_URL}/${JS_FILE}" && \
+    cd /tmp && \
+    echo "  - Downloading file..." && \
+    curl -fSL --progress-bar -w "HTTP Status: %{http_code}, Size: %{size_download} bytes\n" \
+        -o selkies-js-interposer.deb "${CDN_BASE_URL}/${JS_FILE}" && \
+    if [ ! -f selkies-js-interposer.deb ]; then \
+        echo "  ✗ ERROR: File was not downloaded!" && exit 1; \
+    fi && \
+    DEB_SIZE=$(stat -c%s selkies-js-interposer.deb 2>/dev/null || stat -f%z selkies-js-interposer.deb 2>/dev/null) && \
+    echo "  - Downloaded file size: $((DEB_SIZE / 1024)) KB (${DEB_SIZE} bytes)" && \
+    if [ ${DEB_SIZE} -lt 1000 ]; then \
+        echo "  ✗ ERROR: File is too small (< 1 KB), probably download failed" && \
+        cat selkies-js-interposer.deb && \
+        exit 1; \
+    fi && \
+    echo "  - Installing package..." && \
     apt-get update && apt-get install --no-install-recommends -y ./selkies-js-interposer.deb && \
     rm -f selkies-js-interposer.deb && \
     echo "  ✓ JS Interposer installed" && \

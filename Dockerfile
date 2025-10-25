@@ -559,41 +559,59 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
         libxv1 \
         libxtst6 \
         libxext6 && \
-    if [[ "$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')" > "20.04" ]]; then \
-            apt-get install --no-install-recommends -y xcvt libopenh264-dev svt-av1 aom-tools; \
-        else \
-            apt-get install --no-install-recommends -y mesa-utils-extra; \
-        fi && \
-    # Automatically fetch the latest Selkies version and install the components
-    # менять SELKIES_VERSION и UBUNTU_VERSION если будут проблемы.
-    echo "Fetching Selkies version from CDN..." && \
-    SELKIES_VERSION="1.6.2def" && \
-    UBUNTU_VERSION="24.04" && \
-    ARCH="amd64" && \
-    echo "Using fixed Selkies version: ${SELKIES_VERSION}" && \
-    echo "Ubuntu version: ${UBUNTU_VERSION}" && \
+    if [ "$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')" \> "20.04" ]; then apt-get install --no-install-recommends -y xcvt libopenh264-dev svt-av1 aom-tools; else apt-get install --no-install-recommends -y mesa-utils-extra; fi && \
+    # Install Selkies components from CDN (cdn.warplay.cloud)
+    SELKIES_VERSION="1.6.2" && \
+    UBUNTU_VERSION="$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"')" && \
+    ARCH="$(dpkg --print-architecture)" && \
+    CDN_BASE_URL="https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}" && \
+    echo "========================================" && \
+    echo "Installing Selkies v${SELKIES_VERSION}" && \
+    echo "Ubuntu Version: ${UBUNTU_VERSION}" && \
     echo "Architecture: ${ARCH}" && \
-    echo "Downloading gstreamer-selkies package..." && \
-    echo "URL: https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/gstreamer-selkies_gpl_v${SELKIES_VERSION}_ubuntu${UBUNTU_VERSION}_${ARCH}.tar.gz" && \
-    cd /opt && curl -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/gstreamer-selkies_gpl_v${SELKIES_VERSION}_ubuntu${UBUNTU_VERSION}_${ARCH}.tar.gz" | tar -xzf - && echo "GStreamer package downloaded successfully" && \
-    echo "Downloading selkies_gstreamer Python package..." && \
-    echo "URL: https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies_gstreamer-v${SELKIES_VERSION}-py3-none-any.whl" && \
-    cd /tmp && curl -O -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies_gstreamer-v${SELKIES_VERSION}-py3-none-any.whl" && \
-    echo "Python wheel downloaded successfully" && \
-    pip3 install --no-cache-dir --force-reinstall "selkies_gstreamer-v${SELKIES_VERSION}-py3-none-any.whl" "websockets<14.0" && \
-    rm -f "selkies_gstreamer-v${SELKIES_VERSION}-py3-none-any.whl" && \
-    echo "Downloading selkies-gstreamer-web package..." && \
-    echo "URL: https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies-gstreamer-web_v${SELKIES_VERSION}.tar.gz" && \
-    cd /opt && curl -fsSL "https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies-gstreamer-web_v${SELKIES_VERSION}.tar.gz" | tar -xzf - && \
-    echo "Web package downloaded successfully" && \
-    echo "Downloading selkies-js-interposer package..." && \
-    INTERPOSER_URL="https://cdn.warplay.cloud/drivers/linux/system/selkies/releases/download/v${SELKIES_VERSION}/selkies-js-interposer_v${SELKIES_VERSION}_ubuntu${UBUNTU_VERSION}_${ARCH}.deb" && \
-    echo "URL: ${INTERPOSER_URL}" && \
-    cd /tmp && \
-    curl -fLo selkies-js-interposer.deb "${INTERPOSER_URL}" && \
-    echo "JS interposer downloaded successfully" && \
+    echo "CDN Base URL: ${CDN_BASE_URL}" && \
+    echo "========================================" && \
+    # Step 1: Download and extract GStreamer Selkies GPL bundle to /opt
+    echo "[1/4] Downloading GStreamer Selkies GPL bundle..." && \
+    GSTREAMER_FILE="gstreamer-selkies_gpl_v${SELKIES_VERSION}_ubuntu${UBUNTU_VERSION}_${ARCH}.tar.gz" && \
+    echo "  - File: ${GSTREAMER_FILE}" && \
+    echo "  - URL: ${CDN_BASE_URL}/${GSTREAMER_FILE}" && \
+    cd /opt && curl -fsSL "${CDN_BASE_URL}/${GSTREAMER_FILE}" | tar -xzf - && \
+    echo "  ✓ GStreamer bundle extracted to /opt" && \
+    # Step 2: Download and install Python wheel package
+    echo "[2/4] Downloading and installing Selkies GStreamer Python package..." && \
+    WHL_FILE="selkies_gstreamer-${SELKIES_VERSION}-py3-none-any.whl" && \
+    echo "  - File: ${WHL_FILE}" && \
+    echo "  - URL: ${CDN_BASE_URL}/${WHL_FILE}" && \
+    cd /tmp && curl -O -fsSL "${CDN_BASE_URL}/${WHL_FILE}" && \
+    echo "  - Installing via pip3..." && \
+    pip3 install --no-cache-dir --force-reinstall "${WHL_FILE}" "websockets<14.0" && \
+    rm -f "${WHL_FILE}" && \
+    echo "  ✓ Python package installed" && \
+    # Step 3: Download and extract Selkies GStreamer Web interface to /opt
+    echo "[3/4] Downloading Selkies GStreamer Web interface..." && \
+    WEB_FILE="selkies-gstreamer-web_v${SELKIES_VERSION}.tar.gz" && \
+    echo "  - File: ${WEB_FILE}" && \
+    echo "  - URL: ${CDN_BASE_URL}/${WEB_FILE}" && \
+    cd /opt && curl -fsSL "${CDN_BASE_URL}/${WEB_FILE}" | tar -xzf - && \
+    echo "  ✓ Web interface extracted to /opt" && \
+    # Step 4: Download and install Selkies JS Interposer (using Ubuntu 22.04 version for compatibility with 24.04)
+    echo "[4/4] Downloading and installing Selkies JS Interposer..." && \
+    JS_UBUNTU_VERSION="${UBUNTU_VERSION}" && \
+    if [ "${UBUNTU_VERSION}" = "24.04" ]; then \
+        JS_UBUNTU_VERSION="22.04"; \
+        echo "  - Note: Using Ubuntu 22.04 version for compatibility with 24.04"; \
+    fi && \
+    JS_FILE="selkies-js-interposer_v${SELKIES_VERSION}_ubuntu${JS_UBUNTU_VERSION}_${ARCH}.deb" && \
+    echo "  - File: ${JS_FILE}" && \
+    echo "  - URL: ${CDN_BASE_URL}/${JS_FILE}" && \
+    cd /tmp && curl -o selkies-js-interposer.deb -fsSL "${CDN_BASE_URL}/${JS_FILE}" && \
     apt-get update && apt-get install --no-install-recommends -y ./selkies-js-interposer.deb && \
     rm -f selkies-js-interposer.deb && \
+    echo "  ✓ JS Interposer installed" && \
+    echo "========================================" && \
+    echo "✓ Selkies v${SELKIES_VERSION} installation completed successfully!" && \
+    echo "========================================" && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /var/cache/debconf/* /var/log/* /tmp/* /var/tmp/*
 
 # Install the KasmVNC web interface and RustDesk for fallback

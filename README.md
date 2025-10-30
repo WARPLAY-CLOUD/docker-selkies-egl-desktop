@@ -364,7 +364,7 @@ Make sure that the `NVIDIA_DRIVER_CAPABILITIES` environment variable is set to `
 </details>
 
 ### I want to use a specific GPU for OpenGL rendering when I have multiple GPUs in one container.
-
+ 
 <details markdown>
   <summary>Open Answer</summary>
 
